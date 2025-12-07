@@ -322,25 +322,6 @@
             display: none;
         }
 
-        /* Terminal text effect */
-        .terminal-text {
-            overflow: hidden;
-            border-right: 2px solid var(--neon-green);
-            white-space: nowrap;
-            margin: 0 auto;
-            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-        }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--neon-green) }
-        }
-
         /* Binary rain effect */
         .binary-rain {
             position: absolute;
@@ -399,7 +380,7 @@
             <h1 class="glitch" data-text="Tolqis Hub Joiner">Tolqis Hub Joiner</h1>
         </div>
         
-        <p class="status-text terminal-text">Initializing server connection protocol...</p>
+        <p class="status-text" id="statusText">Initializing server connection protocol...</p>
         
         <!-- Tech loader -->
         <div id="loader">
@@ -444,7 +425,7 @@
             }
         }
 
-        // Main script
+        // Main script - HEMMEN ROBLOX'A YÖNLENDİR
         window.onload = function() {
             createBinaryRain();
             
@@ -453,56 +434,35 @@
             const placeId = params.get('placeId');
             const gameInstanceId = params.get('gameInstanceId');
 
-            // Update status text
-            const statusText = document.querySelector('.status-text');
-            const statusMessages = [
-                "Establishing secure connection...",
-                "Authenticating credentials...",
-                "Bypassing firewall...",
-                "Initializing Roblox protocol...",
-                "Connecting to target server..."
-            ];
-            
-            let messageIndex = 0;
-            const messageInterval = setInterval(() => {
-                if (messageIndex < statusMessages.length) {
-                    statusText.textContent = statusMessages[messageIndex];
-                    messageIndex++;
-                }
-            }, 600);
+            const statusText = document.getElementById('statusText');
+            const loader = document.getElementById('loader');
+            const errorDiv = document.getElementById('error-message');
 
             // Check if the required parameters exist
             if (placeId && gameInstanceId) {
                 // Construct the Roblox URL protocol link
                 const robloxUrl = `roblox://placeID=${placeId}&gameInstanceId=${gameInstanceId}`;
                 
-                // Short delay for dramatic effect
+                // Update status immediately
+                statusText.textContent = "Redirecting to Roblox...";
+                
+                // IMMEDIATELY redirect - NO DELAY
+                window.location.href = robloxUrl;
+
+                // Set a fallback message if redirect fails
                 setTimeout(() => {
-                    statusText.textContent = "Redirecting to Roblox...";
-                    clearInterval(messageInterval);
-                    
-                    // Redirect the user to the Roblox app
-                    window.location.href = robloxUrl;
-
-                    // Set a fallback message in case the redirect doesn't work
-                    setTimeout(() => {
-                        document.getElementById('loader').style.display = 'none';
-                        const errorDiv = document.getElementById('error-message');
-                        errorDiv.innerHTML = "<p><strong>NOTICE:</strong> If Roblox didn't launch automatically, please ensure it's installed and try again.</p>";
-                        errorDiv.style.display = 'block';
-                    }, 3000);
-
-                }, 3500);
+                    // If we're still on the page after 2 seconds, show an error
+                    loader.style.display = 'none';
+                    errorDiv.innerHTML = "<p><strong>NOTICE:</strong> If Roblox didn't launch automatically:<br>1. Make sure Roblox is installed<br>2. Try clicking the link below<br><br><a href='" + robloxUrl + "' style='color:#00ff00;'>Click here to join manually</a></p>";
+                    errorDiv.style.display = 'block';
+                }, 2000);
 
             } else {
-                // If parameters are missing, hide the loader and show an error
-                clearInterval(messageInterval);
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                    statusText.textContent = "Connection failed - Invalid parameters";
-                    statusText.style.color = "#ff5555";
-                    document.getElementById('error-message').style.display = 'block';
-                }, 2000);
+                // If parameters are missing, show error immediately
+                loader.style.display = 'none';
+                statusText.textContent = "Connection failed - Invalid parameters";
+                statusText.style.color = "#ff5555";
+                errorDiv.style.display = 'block';
             }
         };
     </script>
